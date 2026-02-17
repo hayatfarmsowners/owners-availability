@@ -1,0 +1,588 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Hayat Farms — Owners</title>
+
+  <!-- Flatpickr (calendar) -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+
+  <style>
+    :root{
+      --aqua:#14c6c9;
+      --aqua2:#0ea5a8;
+      --bg1:#06161a;
+      --card: rgba(255,255,255,.08);
+      --stroke: rgba(255,255,255,.14);
+      --text: rgba(255,255,255,.92);
+      --muted: rgba(255,255,255,.68);
+      --danger:#ff3b30; /* iOS red */
+      --ok:#34c759;
+      --shadow: 0 20px 70px rgba(0,0,0,.45);
+      --radius: 22px;
+      --font: -apple-system, BlinkMacSystemFont, "SF Pro Display","SF Pro Text", "Segoe UI", Roboto, Arial, sans-serif;
+    }
+
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      font-family:var(--font);
+      color:var(--text);
+      min-height:100vh;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding:22px;
+      background:
+        radial-gradient(1100px 700px at 80% 10%, rgba(20,198,201,.22), transparent 55%),
+        radial-gradient(900px 600px at 15% 85%, rgba(14,165,168,.20), transparent 55%),
+        linear-gradient(180deg, #041215, #02090b);
+      position:relative;
+      overflow:hidden;
+    }
+
+    /* watermark */
+    body::before{
+      content:"HAYAT FARMS • HAYAT FARMS • HAYAT FARMS •";
+      position:absolute;
+      inset:-40px;
+      font-weight:800;
+      font-size:28px;
+      letter-spacing:2px;
+      opacity:.06;
+      transform: rotate(-18deg);
+      white-space:nowrap;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      pointer-events:none;
+      color:#fff;
+    }
+
+    .wrap{
+      width:min(980px, 100%);
+      display:grid;
+      gap:18px;
+    }
+
+    .top{
+      display:flex;
+      align-items:flex-start;
+      justify-content:space-between;
+      gap:14px;
+    }
+
+    .brand{
+      display:flex;
+      flex-direction:column;
+      gap:6px;
+    }
+    .brand h1{
+      margin:0;
+      font-size:22px;
+      letter-spacing:.2px;
+    }
+    .brand p{
+      margin:0;
+      color:var(--muted);
+      font-size:13px;
+      line-height:1.5;
+    }
+
+    .card{
+      background:var(--card);
+      border:1px solid var(--stroke);
+      border-radius:var(--radius);
+      box-shadow:var(--shadow);
+      backdrop-filter: blur(14px);
+      padding:18px;
+    }
+
+    .grid{
+      display:grid;
+      grid-template-columns: 1.1fr .9fr;
+      gap:16px;
+    }
+
+    @media (max-width: 860px){
+      .grid{grid-template-columns:1fr}
+    }
+
+    .label{
+      font-size:12px;
+      color:var(--muted);
+      margin:0 0 8px 0;
+    }
+    input{
+      width:100%;
+      padding:14px 14px;
+      border-radius:16px;
+      border:1px solid rgba(255,255,255,.18);
+      background: rgba(0,0,0,.25);
+      color:var(--text);
+      outline:none;
+      font-size:15px;
+    }
+    input::placeholder{color:rgba(255,255,255,.45)}
+    .row{display:flex; gap:10px; flex-wrap:wrap}
+
+    .btn{
+      border:0;
+      border-radius:16px;
+      padding:12px 14px;
+      font-weight:700;
+      cursor:pointer;
+      transition:.15s transform ease, .15s opacity ease;
+      user-select:none;
+    }
+    .btn:active{transform:scale(.98)}
+    .btn-primary{
+      background: linear-gradient(135deg, var(--aqua), var(--aqua2));
+      color:#001214;
+    }
+    .btn-ghost{
+      background: rgba(255,255,255,.10);
+      color:var(--text);
+      border:1px solid rgba(255,255,255,.14);
+    }
+    .btn-danger{
+      background: rgba(255,59,48,.14);
+      color:#fff;
+      border:1px solid rgba(255,59,48,.35);
+    }
+
+    .hint{
+      margin-top:10px;
+      font-size:12px;
+      color:var(--muted);
+      line-height:1.55;
+    }
+
+    .status{
+      margin-top:10px;
+      font-size:12px;
+      color:var(--muted);
+    }
+    .status strong{color:#fff}
+
+    /* calendar container */
+    .calWrap{
+      padding:14px;
+      border-radius:18px;
+      border:1px solid rgba(255,255,255,.14);
+      background: rgba(0,0,0,.22);
+      overflow:hidden;
+      }
+
+    /* Flatpickr styling */
+    .flatpickr-calendar{
+      background: transparent !important;
+      box-shadow:none !important;
+      border:0 !important;
+      width:100% !important;
+      direction:ltr; /* flatpickr is ltr; keep fine */
+    }
+    .flatpickr-months .flatpickr-month{
+      color:#fff !important;
+    }
+    .flatpickr-current-month .flatpickr-monthDropdown-months,
+    .flatpickr-current-month input.cur-year{
+      color:#fff !important;
+      background: transparent !important;
+    }
+    .flatpickr-weekdays, .flatpickr-days{
+      background: transparent !important;
+    }
+    .flatpickr-day{
+      border-radius:12px !important;
+      color: rgba(255,255,255,.90) !important;
+    }
+    .flatpickr-day:hover{
+      background: rgba(20,198,201,.18) !important;
+      border-color: transparent !important;
+    }
+    /* selected days => RED */
+    .flatpickr-day.selected,
+    .flatpickr-day.startRange,
+    .flatpickr-day.endRange{
+      background: var(--danger) !important;
+      border-color: var(--danger) !important;
+      color:#fff !important;
+    }
+    .flatpickr-day.today{
+      border-color: rgba(20,198,201,.55) !important;
+    }
+
+    .chips{
+      display:flex;
+      flex-wrap:wrap;
+      gap:8px;
+      margin-top:12px;
+    }
+    .chip{
+      padding:8px 10px;
+      border-radius:999px;
+      font-size:12px;
+      background: rgba(255,255,255,.10);
+      border:1px solid rgba(255,255,255,.14);
+      color:#fff;
+    }
+
+    /* Pages (steps) */
+    .page{display:none}
+    .page.active{display:block}
+
+    .title2{
+      margin:0 0 10px 0;
+      font-size:18px;
+    }
+
+    .confirmBox{
+      border-radius:18px;
+      border:1px solid rgba(255,255,255,.14);
+      background: rgba(0,0,0,.22);
+      padding:14px;
+      line-height:1.7;
+      color:rgba(255,255,255,.88);
+    }
+
+    .okIcon{
+      width:48px;height:48px;
+      border-radius:16px;
+      background: rgba(52,199,89,.16);
+      border:1px solid rgba(52,199,89,.35);
+      display:flex;align-items:center;justify-content:center;
+      font-size:24px;
+      margin-bottom:12px;
+    }
+
+    .footerRow{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:10px;
+      flex-wrap:wrap;
+      margin-top:12px;
+    }
+
+    .tiny{
+      font-size:11px;
+      color:rgba(255,255,255,.55);
+    }
+  </style>
+</head>
+
+<body>
+  <div class="wrap">
+    <div class="top">
+      <div class="brand">
+        <h1>Hayat Farms — Owners</h1>
+        <p>تحديث مواعيد الحجز بشكل سريع. اختار الأيام المحجوزة من التقويم (بتصير أحمر) ثم أكد.</p>
+      </div>
+    </div>
+
+    <!-- PAGE 1 -->
+    <div class="card page active" id="page1">
+      <div class="grid">
+        <div>
+          <p class="label">كود المزرعة</p>
+          <input id="farmCode" placeholder="مثال: HF-7X29-OWNER" autocomplete="off" />
+
+          <div class="hint">
+            <strong>طريقة الاستخدام:</strong>
+            اختار الأيام المحجوزة من التقويم. كل يوم تختاره بيصير لونه أحمر.
+            بعد ما تخلص، اضغط <strong>التالي</strong>.
+          </div>
+
+          <div class="status" id="status1">الحالة: <strong>جاهز</strong></div>
+
+          <div class="footerRow">
+            <div class="row">
+              <button class="btn btn-primary" id="toConfirm">التالي</button>
+              <button class="btn btn-ghost" id="clearAll">مسح كل التواريخ</button>
+            </div>
+            <div class="tiny" id="selectedCount">0 يوم مختار</div>
+          </div>
+
+          <div class="chips" id="chips"></div>
+        </div>
+
+        <div>
+          <p class="label">التواريخ المحجوزة</p>
+          <div class="calWrap">
+            <input id="calendar" type="text" style="display:none;" />
+            <div id="calendarInline"></div>
+          </div>
+
+          <div class="hint">
+            تقدر تختار أكثر من يوم. إذا ضغطت على يوم مختار، رح ينشال.
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- PAGE 2 (CONFIRM) -->
+    <div class="card page" id="page2">
+      <h2 class="title2">تأكيد التواريخ</h2>
+      <div class="confirmBox" id="confirmText"></div>
+      <div class="footerRow">
+        <div class="row">
+          <button class="btn btn-primary" id="confirmYes">تأكيد</button>
+          <button class="btn btn-danger" id="confirmNo">تغيير</button>
+        </div>
+        <div class="tiny">سيتم إرسال إشعار رسمي إلى الإدارة بعد التأكيد.</div>
+      </div>
+    </div>
+
+    <!-- PAGE 3 (DONE) -->
+    <div class="card page" id="page3">
+      <div class="okIcon">✅</div>
+      <h2 class="title2">تم تسجيل الحجز</h2>
+      <p style="margin:0;color:var(--muted);line-height:1.7">
+        تم اعتماد التواريخ التي قمت بتحديدها كمواعيد محجوزة لمزرعتك.
+      </p>
+
+      <div class="footerRow">
+        <div class="row">
+          <button class="btn btn-primary" id="doneOk">تم</button>
+          <button class="btn btn-ghost" id="doneChange">تغيير مواعيد الحجز</button>
+        </div>
+        <div class="tiny" id="doneSummary"></div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+  <script>
+    // ============
+    //  CONFIG
+    // ============
+    const BOT_TOKEN = "8366339729:AAETpHG82bSLlK7mhydBaJdSkcR50ACRn-M";
+    const CHAT_ID   = "1780166982";
+
+    // ============
+    //  HELPERS
+    // ============
+    const $ = (id) => document.getElementById(id);
+
+    function showPage(n){
+      ["page1","page2","page3"].forEach((p,i)=>{
+        $(p).classList.toggle("active", i === (n-1));
+      });
+      window.scrollTo({top:0, behavior:"smooth"});
+    }
+
+    function fmtISO(d){
+      const y = d.getFullYear();
+      const m = String(d.getMonth()+1).padStart(2,"0");
+      const day = String(d.getDate()).padStart(2,"0");
+      return ${y}-${m}-${day};
+    }
+
+    function sortDates(arr){
+      return [...arr].sort((a,b)=>a.getTime()-b.getTime());
+    }
+
+    function renderChips(dates){
+      const chips = $("chips");
+      chips.innerHTML = "";
+      const sorted = sortDates(dates);
+
+      sorted.forEach(d=>{
+        const chip = document.createElement("div");
+        chip.className = "chip";
+        chip.textContent = fmtISO(d);
+        chips.appendChild(chip);
+      });
+
+      $("selectedCount").textContent = ${sorted.length} يوم مختار;
+      $("doneSummary").textContent = sorted.length ? التواريخ: ${sorted.map(fmtISO).join("، ")} : "";
+    }
+
+    function setStatus(text, strong){
+      $("status1").innerHTML = الحالة: <strong>${strong}</strong> — ${text};
+    }
+
+    async function sendTelegram(text){
+      // إرسال رسمي بالعربي
+      const url = https://api.telegram.org/bot${encodeURIComponent(BOT_TOKEN)}/sendMessage;
+      const payload = {
+        chat_id: CHAT_ID,
+        text,
+        disable_web_page_preview: true
+      };
+
+      const res = await fetch(url, {
+        method:"POST",
+        headers:{ "Content-Type":"application/json" },
+        body: JSON.stringify(payload)
+      });
+
+      if(!res.ok){
+        const t = await res.text().catch(()=> "");
+        throw new Error(`Telegram error: ${res.status} ${t}`);
+      }
+
+      const data = await res.json();
+      if(!data.ok) throw new Error(`Telegram not ok: ${JSON.stringify(data)}`);
+      return data;
+    }
+
+    // ============
+    //  STATE
+    // ============
+    const state = {
+      code: "",
+      dates: []
+    };
+
+    function loadSaved(){
+      try{
+        const raw = localStorage.getItem("hayat_farms_owner");
+        if(!raw) return;
+        const obj = JSON.parse(raw);
+        if(obj && typeof obj.code === "string") state.code = obj.code;
+        if(Array.isArray(obj.dates)) state.dates = obj.dates.map(x=> new Date(x)).filter(d=>!isNaN(d));
+      }catch{}
+    }
+    function save(){
+      const obj = {
+        code: state.code,
+        dates: state.dates.map(d=>d.toISOString())
+      };
+      localStorage.setItem("hayat_farms_owner", JSON.stringify(obj));
+    }
+
+    // ============
+    //  INIT
+    // ============
+    loadSaved();
+    $("farmCode").value = state.code;
+
+    // Flatpickr inline multiple dates
+    const fp = flatpickr("#calendar", {
+      inline: true,
+      appendTo: $("calendarInline"),
+      mode: "multiple",
+      dateFormat: "Y-m-d",
+      defaultDate: state.dates,
+      onChange: function(selectedDates){
+        state.dates = selectedDates || [];
+        save();
+        renderChips(state.dates);
+      }
+    });
+
+    renderChips(state.dates);
+
+    // ============
+    //  ACTIONS
+    // ============
+    $("farmCode").addEventListener("input", (e)=>{
+      state.code = (e.target.value || "").trim();
+      save();
+    });
+
+    $("clearAll").addEventListener("click", ()=>{
+      fp.clear();
+      state.dates = [];
+      save();
+      renderChips(state.dates);
+      setStatus("تم مسح جميع التواريخ.", "جاهز");
+    });
+
+    $("toConfirm").addEventListener("click", ()=>{
+      state.code = ($("farmCode").value || "").trim();
+      save();
+
+      if(!state.code){
+        setStatus("اكتب كود المزرعة أولاً.", "تنبيه");
+        return;
+      }
+      if(!state.dates.length){
+        setStatus("اختار على الأقل يوم واحد من التقويم.", "تنبيه");
+        return;
+      }
+
+      const sorted = sortDates(state.dates).map(fmtISO);
+      $("confirmText").innerHTML =
+        قمت بكتابة أن مزرعتك <strong>محجوزة</strong> في التواريخ المكتوبة أدناه، هل هذا صحيح؟<br><br> +
+        <strong>كود المزرعة:</strong> ${state.code}<br> +
+        <strong>التواريخ:</strong> ${sorted.join("، ")};
+
+      showPage(2);
+    });
+
+    $("confirmNo").addEventListener("click", async ()=>{
+      // رجوع للصفحة الأولى + إشعار تغيير (بدون تفاصيل)
+      try{
+        const msg =
+`Hayat Farms | طلب تغيير مواعيد الحجز
+كود المزرعة: ${state.code || "-"}
+الإجراء: الرجوع للتعديل قبل التأكيد
+الوقت: ${new Date().toLocaleString("ar-EG")}`;
+
+        if(BOT_TOKEN !== "PUT_YOUR_BOT_TOKEN_HERE" && CHAT_ID !== "PUT_YOUR_CHAT_ID_HERE"){
+          await sendTelegram(msg);
+        }
+      }catch(e){
+        // ما نوقف المستخدم لو فشل الإرسال
+        console.warn(e);
+      }
+      showPage(1);
+    });
+
+    $("confirmYes").addEventListener("click", async ()=>{
+      // تأكيد نهائي + إرسال إشعار مع التفاصيل
+      const sorted = sortDates(state.dates).map(fmtISO);
+      const msg =
+`Hayat Farms | تحديث حجز (تأكيد)
+كود المزرعة: ${state.code}
+التواريخ المحجوزة: ${sorted.join("، ")}
+الإجراء: تأكيد التحديث
+الوقت: ${new Date().toLocaleString("ar-EG")}`;
+
+      setStatus("جارٍ الإرسال...", "معالجة");
+
+      try{
+        if(BOT_TOKEN === "8366339729:AAETpHG82bSLlK7mhydBaJdSkcR50ACRn-M" || CHAT_ID === "1780166982"){
+          throw new Error("ضع BOT_TOKEN و CHAT_ID داخل الكود أولاً.");
+        }
+        await sendTelegram(msg);
+        setStatus("تم إرسال الإشعار بنجاح.", "جاهز");
+      }catch(e){
+        setStatus("تم التأكيد محلياً، لكن فشل إرسال تيليجرام. راجع التوكن/الشات.", "تنبيه");
+        console.warn(e);
+      }
+
+      showPage(3);
+    });
+
+    $("doneOk").addEventListener("click", ()=>{
+      // ممكن نخليها فقط تقفل/ترجع للأولى
+      showPage(1);
+      setStatus("تم.", "جاهز");
+    });
+
+    $("doneChange").addEventListener("click", async ()=>{
+      // يرجع للأولى + إشعار “تغيير بعد التأكيد”
+      try{
+        const msg =
+`Hayat Farms | تغيير بعد التأكيد
+كود المزرعة: ${state.code || "-"}
+الإجراء: فتح تعديل المواعيد بعد شاشة (تم)
+الوقت: ${new Date().toLocaleString("ar-EG")}`;
+
+        if(BOT_TOKEN !== "8366339729:AAETpHG82bSLlK7mhydBaJdSkcR50ACRn-M" && CHAT_ID !== "1780166982"){
+          await sendTelegram(msg);
+        }
+      }catch(e){
+        console.warn(e);
+      }
+      showPage(1);
+      setStatus("رجعناك للتعديل.", "جاهز");
+    });
+  </script>
+</body>
+</html>
