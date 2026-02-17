@@ -16,7 +16,6 @@
       --text: rgba(255,255,255,.92);
       --muted: rgba(255,255,255,.68);
       --danger:#ff3b30;
-      --ok:#34c759;
       --shadow: 0 20px 70px rgba(0,0,0,.45);
       --radius: 22px;
       --font: -apple-system, BlinkMacSystemFont, "SF Pro Display","SF Pro Text", "Segoe UI", Roboto, Arial, sans-serif;
@@ -109,7 +108,7 @@
       padding:12px 14px;
       font-weight:700;
       cursor:pointer;
-      transition:.15s transform ease, .15s opacity ease;
+      transition:.15s transform ease;
       user-select:none;
     }
     .btn:active{ transform:scale(.98) }
@@ -127,7 +126,6 @@
       border:1px solid rgba(255,255,255,.14);
       background: rgba(0,0,0,.22);
       overflow:hidden;
-      max-width:100%;
     }
 
     /* Flatpickr */
@@ -138,9 +136,7 @@
       width:100% !important;
       max-width:100% !important;
     }
-    .flatpickr-innerContainer, .flatpickr-rContainer, .flatpickr-days { width:100% !important; max-width:100% !important; }
-    .
-    flatpickr-months .flatpickr-month{ color:#fff !important; }
+    .flatpickr-months .flatpickr-month{ color:#fff !important; }
     .flatpickr-current-month .flatpickr-monthDropdown-months,
     .flatpickr-current-month input.cur-year{
       color:#fff !important;
@@ -250,7 +246,9 @@
         <div>
           <p class="label">التقويم (اختيار أيام متعددة)</p>
           <div class="calWrap">
-            <input id="calendar" type="text" />
+            <!-- نخلي الإدخال مخفي ونرسم التقويم داخل div لضمان ظهوره على الآيفون -->
+            <input id="calendar" type="text" style="display:none;" />
+            <div id="calendarInline"></div>
           </div>
 
           <div class="hint">
@@ -262,7 +260,7 @@
 
     <!-- PAGE 2 -->
     <div class="card page" id="page2">
-      <h2 class="title2">تأكيد التواريخ</h2>
+      <h2 class="title2">تأكيد</h2>
       <div class="confirmBox" id="confirmText"></div>
 
       <div class="footerRow">
@@ -270,16 +268,16 @@
           <button class="btn btn-primary" id="confirmYes">تأكيد</button>
           <button class="btn btn-danger" id="confirmNo">تغيير</button>
         </div>
-        <div class="tiny">سيتم إرسال إشعار رسمي إلى الإدارة بعد التأكيد.</div>
+        <div class="tiny">سيتم إرسال إشعار رسمي بعد التأكيد.</div>
       </div>
     </div>
 
     <!-- PAGE 3 -->
     <div class="card page" id="page3">
       <div class="okIcon">✅</div>
-      <h2 class="title2">تم تسجيل التحديث</h2>
+      <h2 class="title2">تم</h2>
       <p style="margin:0;color:var(--muted);line-height:1.7">
-        تم تسجيل وضع الحجز لمزرعتك حسب التواريخ التي تم اعتمادها.
+        تم تسجيل التحديث.
       </p>
 
       <div class="footerRow">
@@ -294,9 +292,7 @@
 
   <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
   <script>
-    // ============
-    //  CONFIG (حط قيمك هون)
-    // ============
+    // CONFIG (جاهزة)
     const BOT_TOKEN = "8366339729:AAETpHG82bSLlK7mhydBaJdSkcR50ACRn-M";
     const CHAT_ID   = "1780166982";
 
@@ -311,7 +307,7 @@
       const y = d.getFullYear();
       const m = String(d.getMonth()+1).padStart(2,"0");
       const day = String(d.getDate()).padStart(2,"0");
-      return ${y}-${m}-${day};
+      return `${y}-${m}-${day}`;
     }
 
     function sortDates(arr){ return [...arr].sort((a,b)=>a.getTime()-b.getTime()); }
@@ -320,22 +316,26 @@
       const chips = $("chips");
       chips.innerHTML = "";
       const sorted = sortDates(dates);
+
       sorted.forEach(d=>{
         const chip = document.createElement("div");
         chip.className = "chip";
         chip.textContent = fmtISO(d);
         chips.appendChild(chip);
       });
-      $("selectedCount").textContent = ${sorted.length} يوم مختار;
-      $("doneSummary").textContent = sorted.length ? التواريخ: ${sorted.map(fmtISO).join("، ")} : لا يوجد حجوزات;
+
+      $("selectedCount").textContent = `${sorted.length} يوم مختار`;
+      $("doneSummary").textContent = sorted.length
+        ? `التواريخ: ${sorted.map(fmtISO).join("، ")}`
+        : `لا يوجد حجوزات`;
     }
 
     function setStatus(text, strong){
-      $("status1").innerHTML = الحالة: <strong>${strong}</strong> — ${text};
+      $("status1").innerHTML = `الحالة: <strong>${strong}</strong> — ${text}`;
     }
 
     async function sendTelegram(text){
-      const url = https://api.telegram.org/bot${encodeURIComponent(BOT_TOKEN)}/sendMessage;
+      const url = `https://api.telegram.org/bot${encodeURIComponent(BOT_TOKEN)}/sendMessage`;
       const payload = { chat_id: CHAT_ID, text, disable_web_page_preview: true };
 
       const res = await fetch(url, {
@@ -345,17 +345,10 @@
       });
 
       const data = await res.json();
-
-if (!data || data.ok !== true) {
-  throw new Error("Telegram send failed");
-}
-
-return data;
+      if (!data || data.ok !== true) throw new Error("Telegram send failed");
+      return data;
     }
 
-    // ============
-    //  STATE
-    // ============
     const state = { code:"", dates:[], noBookings:false };
 
     function loadSaved(){
@@ -380,9 +373,10 @@ return data;
     $("farmCode").value = state.code;
     $("noBookings").checked = state.noBookings;
 
-    // Flatpickr: multiple + forced on iOS
+    // التقويم: Multiple + inline داخل div (مضمون على iPhone)
     const fp = flatpickr("#calendar", {
       inline: true,
+      appendTo: $("calendarInline"),
       mode: "multiple",
       dateFormat: "Y-m-d",
       disableMobile: true,
@@ -397,8 +391,7 @@ return data;
 
     renderChips(state.dates);
 
-    $("farmCode").
-      addEventListener("input", (e)=>{
+    $("farmCode").addEventListener("input", (e)=>{
       state.code = (e.target.value || "").trim();
       save();
     });
@@ -440,15 +433,15 @@ return data;
 
       if(state.noBookings){
         $("confirmText").innerHTML =
-          قمت بكتابة أن مزرعتك <strong>لا يوجد لها أي حجوزات</strong> حالياً، هل هذا صحيح؟<br><br> +
-          <strong>كود المزرعة:</strong> ${state.code}<br> +
-          <strong>الحالة:</strong> لا يوجد حجوزات;
-      }else{
+          `قمت بكتابة أن مزرعتك <strong>لا يوجد لها أي حجوزات</strong> حالياً، هل هذا صحيح؟<br><br>
+           <strong>كود المزرعة:</strong> ${state.code}<br>
+           <strong>الحالة:</strong> لا يوجد حجوزات`;
+      } else {
         const sorted = sortDates(state.dates).map(fmtISO);
         $("confirmText").innerHTML =
-          قمت بكتابة أن مزرعتك <strong>محجوزة</strong> في التواريخ المكتوبة أدناه، هل هذا صحيح؟<br><br> +
-          <strong>كود المزرعة:</strong> ${state.code}<br> +
-          <strong>التواريخ:</strong> ${sorted.join("، ")};
+          `قمت بكتابة أن مزرعتك <strong>محجوزة</strong> في التواريخ المكتوبة أدناه، هل هذا صحيح؟<br><br>
+           <strong>كود المزرعة:</strong> ${state.code}<br>
+           <strong>التواريخ:</strong> ${sorted.join("، ")}`;
       }
 
       showPage(2);
@@ -468,8 +461,16 @@ return data;
 
     $("confirmYes").addEventListener("click", async ()=>{
       const msg = state.noBookings
-        ? Hayat Farms | تحديث الحجز (تأكيد)\nكود المزرعة: ${state.code}\nالحالة: لا يوجد حجوزات\nالإجراء: تأكيد التحديث\nالوقت: ${new Date().toLocaleString("ar-EG")}
-        : Hayat Farms | تحديث الحجز (تأكيد)\nكود المزرعة: ${state.code}\nالتواريخ المحجوزة: ${sortDates(state.dates).map(fmtISO).join("، ")}\nالإجراء: تأكيد التحديث\nالوقت: ${new Date().toLocaleString("ar-EG")};
+        ? `Hayat Farms | تحديث الحجز (تأكيد)
+كود المزرعة: ${state.code}
+الحالة: لا يوجد حجوزات
+الإجراء: تأكيد التحديث
+الوقت: ${new Date().toLocaleString("ar-EG")}`
+        : `Hayat Farms | تحديث الحجز (تأكيد)
+كود المزرعة: ${state.code}
+التواريخ المحجوزة: ${sortDates(state.dates).map(fmtISO).join("، ")}
+الإجراء: تأكيد التحديث
+الوقت: ${new Date().toLocaleString("ar-EG")}`;
 
       setStatus("جارٍ الإرسال...", "معالجة");
       try{
